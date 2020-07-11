@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TDDTraining.ShoppingCart.Domain.UnitTests", "TDDTraining.ShoppingCart.Domain.UnitTests\TDDTraining.ShoppingCart.Domain.UnitTests.csproj", "{030B4A36-7699-4ED5-B4C7-D57AA42D0D74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TDDTraining.ShoppingCart.Domain", "TDDTraining.ShoppingCart.Domain\TDDTraining.ShoppingCart.Domain.csproj", "{E33E22ED-7E48-46F9-881C-21EA098C90C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{030B4A36-7699-4ED5-B4C7-D57AA42D0D74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{030B4A36-7699-4ED5-B4C7-D57AA42D0D74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{030B4A36-7699-4ED5-B4C7-D57AA42D0D74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{030B4A36-7699-4ED5-B4C7-D57AA42D0D74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E33E22ED-7E48-46F9-881C-21EA098C90C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E33E22ED-7E48-46F9-881C-21EA098C90C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E33E22ED-7E48-46F9-881C-21EA098C90C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E33E22ED-7E48-46F9-881C-21EA098C90C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
