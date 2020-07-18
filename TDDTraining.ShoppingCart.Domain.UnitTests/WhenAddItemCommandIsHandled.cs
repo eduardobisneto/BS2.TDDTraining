@@ -1,19 +1,11 @@
 using System;
 using System.Linq;
-using TDDTraining.ShoppingCart.Domain.UnitTests.TestDoubles;
 using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
-    public class WhenAddItemCommandIsHandled
+    public class WhenAddItemCommandIsHandled : WhenHandlingCartCommand<AddItemCommand, AddItemCommandHandler, Cart>
     {
-        private readonly ICartRepository repository;
-
-        public WhenAddItemCommandIsHandled()
-        {
-            repository = new FakeCartRepository();
-        }
-        
         [Fact]
         public void ItemShouldBePresentInTheCartWhitQuantityOfOne()
         {
@@ -60,19 +52,9 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             Assert.Equal(2, item.Quantity);
         }
 
-        private void GivenProductAlreadyExistsInCart(Guid productId, Guid customerId)
+        protected override AddItemCommandHandler CreateCommandHandler()
         {
-            WhenCommandIsHandled(new AddItemCommand(customerId, productId));
+            return new AddItemCommandHandler(Repository);
         }
-
-        private Cart AssumeCartAlreadyExists(Guid customerId)
-        {
-            return WhenCommandIsHandled(new AddItemCommand(customerId, Guid.NewGuid()));
-        }
-
-        private Cart WhenCommandIsHandled(AddItemCommand command)
-        {
-            return new AddItemCommandHandler(repository).Handle(command);
-        } 
     }
 }

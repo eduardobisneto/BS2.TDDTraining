@@ -1,8 +1,6 @@
-using System;
-
 namespace TDDTraining.ShoppingCart.Domain
 {
-    public class AddItemCommandHandler
+    public class AddItemCommandHandler : IHandleCommand<AddItemCommand, Cart>
     {
         private readonly ICartRepository cartRepository;
 
@@ -23,11 +21,5 @@ namespace TDDTraining.ShoppingCart.Domain
             
             return cart;
         }
-    }
-
-    public interface ICartRepository
-    {
-        Cart GetByCustomerId(Guid customerId);
-        void Save(Cart cart);
     }
 }

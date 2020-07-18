@@ -31,5 +31,10 @@ namespace TDDTraining.ShoppingCart.Domain
             else
                 item.IncreaseQuantity();
         }
+
+        public void RemoveItem(Guid productId)
+        {
+            itens.Remove(itens.Find(x => x.ProductId == productId));
+        }
     }
 }
