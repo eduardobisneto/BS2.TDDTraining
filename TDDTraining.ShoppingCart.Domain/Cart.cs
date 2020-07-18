@@ -1,15 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TDDTraining.ShoppingCart.Domain
 {
     public class Cart
     {
+        public Guid Id { get; }
+        public Guid CustomerId { get; }
+        
         private List<Item> itens;
         public IReadOnlyCollection<Item> Itens => itens.AsReadOnly();
-        public Guid CustomerId { get; }
 
-        public Cart(Guid customerId)
+        private Cart()
+        {
+            Id = Guid.NewGuid();
+        }
+        
+        public Cart(Guid customerId) : this()
         {
             CustomerId = customerId;
             itens = new List<Item>();
@@ -17,7 +25,11 @@ namespace TDDTraining.ShoppingCart.Domain
 
         public void AddItem(Guid productId)
         {
-            itens.Add(new Item(productId));
+            var item = itens.SingleOrDefault(x => x.ProductId == productId);
+            if(item == null)
+                itens.Add(new Item(productId));
+            else
+                item.IncreaseQuantity();
         }
     }
 }
