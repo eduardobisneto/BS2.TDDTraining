@@ -52,9 +52,29 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             Assert.Equal(2, item.Quantity);
         }
 
+        [Fact]
+        public void AddedProductShouldHaveTheRightPrice()
+        {
+            var productId = Guid.NewGuid();
+            var productPrice = 100;
+
+            AssumeProductPriceIs(productId, productPrice);
+
+            var cart = WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productId));
+
+            var item = cart.Itens.Single(x => x.ProductId == productId);
+            
+            Assert.Equal(productPrice, item.Price);
+        }
+
         protected override AddItemCommandHandler CreateCommandHandler()
         {
             return new AddItemCommandHandler(Repository);
         }
+        
+        // Quando adicionar um produto no carrinho, o mesmo deve estar com o preço certo
+        // O Preço não virá do comando
+        // Buscar o preço do produto da IProductsApi
+        // Tem que garantir que o produto esta com o preço correto
     }
 }
