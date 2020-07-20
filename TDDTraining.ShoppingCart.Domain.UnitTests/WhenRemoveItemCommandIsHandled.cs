@@ -18,13 +18,21 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             
             Assert.DoesNotContain(cart.Itens, x => x.ProductId == command.ProductId);
         }
-
+        
         [Fact]
-        public void IfCartDoesNotExitsCommandDoesNotFail()
+        public void IfCartDoesNotExistsCommandDoesNotFailAndNewCartIsCreatedForCustomer()
         {
             var command = new RemoveItemCommand(Guid.NewGuid(), Guid.NewGuid());
+            
+            var cart = WhenCommandIsHandled(command);
+            
+            AssertNewCartWasCreatedToTheCustomer(cart, command);
+        }
 
-            WhenCommandIsHandled(command);
+        private static void AssertNewCartWasCreatedToTheCustomer(Cart cart, RemoveItemCommand command)
+        {
+            Assert.NotNull(cart);
+            Assert.Equal(command.CustomerId, cart.CustomerId);
         }
 
         protected override RemoveItemCommandHandler CreateCommandHandler()
