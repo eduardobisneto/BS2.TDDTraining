@@ -1,11 +1,19 @@
 using System;
 using System.Linq;
+using Moq;
 using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
     public class WhenAddItemCommandIsHandled : WhenHandlingCartCommand<AddItemCommand, AddItemCommandHandler, Cart>
     {
+        private readonly Mock<IProductApi> productApiStub;
+
+        public WhenAddItemCommandIsHandled()
+        {
+            productApiStub = CreateProductApiStub();
+        }
+
         [Fact]
         public void ItemShouldBePresentInTheCartWhitQuantityOfOne()
         {
@@ -64,17 +72,19 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
             var item = cart.Itens.Single(x => x.ProductId == productId);
             
-            Assert.Equal(productPrice, item.Price);
+            Assert.Equal(productPrice, item.ProductPrice);
+        }
+
+        private void AssumeProductPriceIs(Guid productId, in int productPrice)
+        {
+            productApiStub
+                .Setup(x => x.GetProduct(productId))
+                .Returns(new ProductInfo(productId, productPrice));
         }
 
         protected override AddItemCommandHandler CreateCommandHandler()
         {
-            return new AddItemCommandHandler(Repository);
+            return new AddItemCommandHandler(Repository, productApiStub.Object);
         }
-        
-        // Quando adicionar um produto no carrinho, o mesmo deve estar com o preço certo
-        // O Preço não virá do comando
-        // Buscar o preço do produto da IProductsApi
-        // Tem que garantir que o produto esta com o preço correto
     }
 }

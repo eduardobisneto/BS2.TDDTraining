@@ -1,4 +1,5 @@
 using System;
+using Moq;
 using TDDTraining.ShoppingCart.Domain.UnitTests.Core;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
@@ -8,12 +9,23 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
     {
         protected void GivenProductAlreadyExistsInCart(Guid productId, Guid customerId)
         {
-            new AddItemCommandHandler(Repository).Handle(new AddItemCommand(customerId, productId));
+            new AddItemCommandHandler(Repository, CreateProductApiStub().Object).Handle(new AddItemCommand(customerId, productId));
         }
-        
+
+        protected static Mock<IProductApi> CreateProductApiStub()
+        {
+            var productApiStub = new Mock<IProductApi>();
+
+            productApiStub
+                .Setup(x => x.GetProduct(It.IsAny<Guid>()))
+                .Returns(new ProductInfo(Guid.NewGuid(), 10));
+            
+            return productApiStub;
+        }
+
         protected Cart AssumeCartAlreadyExists(Guid customerId)
         {
-            return new AddItemCommandHandler(Repository).Handle(new AddItemCommand(customerId, Guid.NewGuid()));
+            return new AddItemCommandHandler(Repository, CreateProductApiStub().Object).Handle(new AddItemCommand(customerId, Guid.NewGuid()));
         }
     }
 }
