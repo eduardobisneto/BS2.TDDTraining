@@ -1,5 +1,6 @@
 using System;
 using Moq;
+using TDDTraining.ShoppingCart.Domain.Tests.Shared;
 using TDDTraining.ShoppingCart.Domain.UnitTests.Core;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests

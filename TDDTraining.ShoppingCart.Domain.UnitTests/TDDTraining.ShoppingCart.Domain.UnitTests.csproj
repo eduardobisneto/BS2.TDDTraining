@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TDDTraining.ShoppingCart.Domain.Tests.Shared\TDDTraining.ShoppingCart.Domain.Tests.Shared.csproj" />
       <ProjectReference Include="..\TDDTraining.ShoppingCart.Domain\TDDTraining.ShoppingCart.Domain.csproj" />
     </ItemGroup>
 

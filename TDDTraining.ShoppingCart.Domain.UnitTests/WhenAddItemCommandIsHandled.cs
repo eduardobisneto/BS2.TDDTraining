@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Moq;
+using TDDTraining.ShoppingCart.Domain.Tests.Shared;
 using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
@@ -116,47 +117,5 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         {
             return new AddItemCommandHandler(Repository, productApiStub.Object, RetryStrategy.CreateRetryStrategy());
         }
-    }
-
-    public class ProductInfoBuilder
-    {
-        private readonly WellKnownProduct wellKnowProduct;
-
-        private ProductInfoBuilder(WellKnownProduct wellKnowProduct)
-        {
-            this.wellKnowProduct = wellKnowProduct;
-        }
-
-        public static ProductInfoBuilder For<T>() where T : WellKnownProduct, new()
-        {
-            var wellKnowProduct = new T();
-            return new ProductInfoBuilder(wellKnowProduct);
-        }
-
-        public ProductInfo Build()
-        {
-            return new ProductInfo(wellKnowProduct.ProductId, wellKnowProduct.Name, wellKnowProduct.Price);
-        }
-    }
-
-    public abstract class WellKnownProduct
-    {
-        public abstract Guid ProductId { get; }
-        public abstract string Name { get; }
-        public abstract decimal Price { get; }
-    }
-
-    public class NikeShoes : WellKnownProduct
-    {
-        public override Guid ProductId => Guid.NewGuid();
-        public override string Name => nameof(NikeShoes);
-        public override decimal Price => 100;
-    }
-    
-    public class Dummy : WellKnownProduct
-    {
-        public override Guid ProductId => Guid.NewGuid();
-        public override string Name => nameof(Dummy);
-        public override decimal Price => 10;
     }
 }
