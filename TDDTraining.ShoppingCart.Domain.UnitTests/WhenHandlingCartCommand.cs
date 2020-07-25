@@ -9,7 +9,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
     {
         protected void GivenProductAlreadyExistsInCart(Guid productId, Guid customerId)
         {
-            new AddItemCommandHandler(Repository, CreateProductApiStub().Object).Handle(new AddItemCommand(customerId, productId));
+            new AddItemCommandHandler(Repository, CreateProductApiStub().Object, RetryStrategy.CreateRetryStrategy()).Handle(new AddItemCommand(customerId, productId));
         }
 
         protected static Mock<IProductApi> CreateProductApiStub()
@@ -18,14 +18,14 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
             productApiStub
                 .Setup(x => x.GetProduct(It.IsAny<Guid>()))
-                .Returns(new ProductInfo(Guid.NewGuid(), 10));
+                .Returns(ProductInfoBuilder.For<Dummy>().Build());
             
             return productApiStub;
         }
 
         protected Cart AssumeCartAlreadyExists(Guid customerId)
         {
-            return new AddItemCommandHandler(Repository, CreateProductApiStub().Object).Handle(new AddItemCommand(customerId, Guid.NewGuid()));
+            return new AddItemCommandHandler(Repository, CreateProductApiStub().Object, RetryStrategy.CreateRetryStrategy()).Handle(new AddItemCommand(customerId, Guid.NewGuid()));
         }
     }
 }

@@ -7,10 +7,12 @@ namespace TDDTraining.ShoppingCart.Domain
         public Guid ProductId { get; }
         public int Quantity { get; private set; }
         public decimal ProductPrice { get; }
+        public string ProductName { get; }
 
-        public Item(Guid productId, decimal productPrice)
+        public Item(Guid productId, string productName, decimal productPrice)
         {
             ProductId = productId;
+            ProductName = productName;
             ProductPrice = productPrice;
             Quantity = 1;
         }

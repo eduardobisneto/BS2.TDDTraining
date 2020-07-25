@@ -23,11 +23,11 @@ namespace TDDTraining.ShoppingCart.Domain
             itens = new List<Item>();
         }
 
-        public void AddItem(Guid productId, decimal productPrice)
+        public void AddItem(Guid productId, string productName, decimal productPrice)
         {
             var item = itens.SingleOrDefault(x => x.ProductId == productId);
             if(item == null)
-                itens.Add(new Item(productId, productPrice));
+                itens.Add(new Item(productId, productName, productPrice));
             else
                 item.IncreaseQuantity();
         }

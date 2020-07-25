@@ -61,30 +61,102 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         }
 
         [Fact]
-        public void AddedProductShouldHaveTheRightPrice()
+        public void AddedProductShouldHaveTheRightProductInfo()
+        {
+            var productInfo = ProductInfoBuilder.For<NikeShoes>().Build();
+
+            AssumeProductInfoIs(productInfo);
+
+            var cart = WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productInfo.ProductId));
+
+            var item = cart.Itens.Single(x => x.ProductId == productInfo.ProductId);
+            
+            Assert.Equal(productInfo.ProductName, item.ProductName);
+            Assert.Equal(productInfo.Price, item.ProductPrice);
+        }
+        
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        public void ProductShouldBeAddedEvenIfProductApiFailsXTimes(int numberOfFailures)
         {
             var productId = Guid.NewGuid();
-            var productPrice = 100;
 
-            AssumeProductPriceIs(productId, productPrice);
+            AssumeProductApiWillFail(productId, numberOfFailures);
 
             var cart = WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productId));
-
-            var item = cart.Itens.Single(x => x.ProductId == productId);
             
-            Assert.Equal(productPrice, item.ProductPrice);
+            Assert.Contains(cart.Itens, x => x.ProductId == productId);
         }
 
-        private void AssumeProductPriceIs(Guid productId, in int productPrice)
+        private void AssumeProductApiWillFail(Guid productId, int numberOfFailures)
+        {
+            var setupSequence = productApiStub
+                .SetupSequence(x => x.GetProduct(productId));
+
+            for (var i = 0; i < numberOfFailures; i++)
+            {
+                setupSequence = setupSequence
+                    .Throws<Exception>();
+            }
+
+            setupSequence
+                .Returns(ProductInfoBuilder.For<Dummy>().Build());
+        }
+
+        private void AssumeProductInfoIs(ProductInfo productInfo)
         {
             productApiStub
-                .Setup(x => x.GetProduct(productId))
-                .Returns(new ProductInfo(productId, productPrice));
+                .Setup(x => x.GetProduct(productInfo.ProductId))
+                .Returns(productInfo);
         }
 
         protected override AddItemCommandHandler CreateCommandHandler()
         {
-            return new AddItemCommandHandler(Repository, productApiStub.Object);
+            return new AddItemCommandHandler(Repository, productApiStub.Object, RetryStrategy.CreateRetryStrategy());
         }
+    }
+
+    public class ProductInfoBuilder
+    {
+        private readonly WellKnownProduct wellKnowProduct;
+
+        private ProductInfoBuilder(WellKnownProduct wellKnowProduct)
+        {
+            this.wellKnowProduct = wellKnowProduct;
+        }
+
+        public static ProductInfoBuilder For<T>() where T : WellKnownProduct, new()
+        {
+            var wellKnowProduct = new T();
+            return new ProductInfoBuilder(wellKnowProduct);
+        }
+
+        public ProductInfo Build()
+        {
+            return new ProductInfo(wellKnowProduct.ProductId, wellKnowProduct.Name, wellKnowProduct.Price);
+        }
+    }
+
+    public abstract class WellKnownProduct
+    {
+        public abstract Guid ProductId { get; }
+        public abstract string Name { get; }
+        public abstract decimal Price { get; }
+    }
+
+    public class NikeShoes : WellKnownProduct
+    {
+        public override Guid ProductId => Guid.NewGuid();
+        public override string Name => nameof(NikeShoes);
+        public override decimal Price => 100;
+    }
+    
+    public class Dummy : WellKnownProduct
+    {
+        public override Guid ProductId => Guid.NewGuid();
+        public override string Name => nameof(Dummy);
+        public override decimal Price => 10;
     }
 }
