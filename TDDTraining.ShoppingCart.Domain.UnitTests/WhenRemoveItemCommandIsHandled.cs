@@ -3,7 +3,7 @@ using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
-    public class WhenRemoveItemCommandIsHandled : WhenHandlingCartCommand<RemoveItemCommand, RemoveItemCommandHandler, Cart>
+    public class WhenRemoveItemCommandIsHandled : WhenHandlingCartCommand<RemoveItemCommand, RemoveItemCommandHandler>
     {
         [Fact]
         public void ProductIsNotPresentInCart()
@@ -14,7 +14,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
             var command = new RemoveItemCommand(customerId, productId);
 
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
             
             Assert.DoesNotContain(cart.Itens, x => x.ProductId == command.ProductId);
         }
@@ -24,7 +24,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         {
             var command = new RemoveItemCommand(Guid.NewGuid(), Guid.NewGuid());
             
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
             
             AssertNewCartWasCreatedToTheCustomer(cart, command);
         }

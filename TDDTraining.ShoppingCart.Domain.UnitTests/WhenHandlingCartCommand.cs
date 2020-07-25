@@ -5,8 +5,8 @@ using TDDTraining.ShoppingCart.Domain.UnitTests.Core;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
-    public abstract class WhenHandlingCartCommand<TCommand, TCommandHandler, TResult> : WhenHandlingCommand<TCommand, TCommandHandler, TResult>
-        where TCommandHandler : IHandleCommand<TCommand, TResult>
+    public abstract class WhenHandlingCartCommand<TCommand, TCommandHandler> : WhenHandlingCommand<TCommand, TCommandHandler>
+        where TCommandHandler : IHandleCommand<TCommand, IDomainResult>
     {
         protected void GivenProductAlreadyExistsInCart(Guid productId, Guid customerId)
         {
@@ -26,7 +26,8 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
         protected Cart AssumeCartAlreadyExists(Guid customerId)
         {
-            return new AddItemCommandHandler(Repository, CreateProductApiStub().Object, RetryStrategy.CreateRetryStrategy()).Handle(new AddItemCommand(customerId, Guid.NewGuid()));
+            return ((OkResult<Cart>)new AddItemCommandHandler(Repository, CreateProductApiStub().Object, RetryStrategy.CreateRetryStrategy())
+                    .Handle(new AddItemCommand(customerId, Guid.NewGuid()))).Body;
         }
     }
 }

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
-    public class WhenAddItemCommandIsHandled : WhenHandlingCartCommand<AddItemCommand, AddItemCommandHandler, Cart>
+    public class WhenAddItemCommandIsHandled : WhenHandlingCartCommand<AddItemCommand, AddItemCommandHandler>
     {
         private readonly Mock<IProductApi> productApiStub;
 
@@ -19,7 +19,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         public void ItemShouldBePresentInTheCartWhitQuantityOfOne()
         {
             var command = new AddItemCommand(Guid.NewGuid(), Guid.NewGuid());
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
             
             Assert.Contains(cart.Itens, x => x.ProductId == command.ProductId);
             var item = cart.Itens.Single(x => x.ProductId == command.ProductId);
@@ -30,7 +30,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         public void CartShouldMatchCustomerId()
         {
             var command = new AddItemCommand(Guid.NewGuid(), Guid.NewGuid());
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
             Assert.Equal(command.CustomerId, cart.CustomerId);
         }
 
@@ -42,7 +42,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
             var command = new AddItemCommand(customerId, Guid.NewGuid());
 
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
             
             Assert.Equal(existingCart.Id, cart.Id);
         }
@@ -55,7 +55,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             GivenProductAlreadyExistsInCart(productId, customerId);
             
             var command = new AddItemCommand(customerId, productId);
-            var cart = WhenCommandIsHandled(command);
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
 
             var item = cart.Itens.Single(x => x.ProductId == productId);
             Assert.Equal(2, item.Quantity);
@@ -64,16 +64,16 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         [Fact]
         public void AddedProductShouldHaveTheRightProductInfo()
         {
-            var productInfo = ProductInfoBuilder.For<NikeShoes>().Build();
+            var nikeShoes = new NikeShoes();
 
-            AssumeProductInfoIs(productInfo);
+            AssumeProductInfoIs(nikeShoes);
 
-            var cart = WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productInfo.ProductId));
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), nikeShoes.ProductId))).Body;
 
-            var item = cart.Itens.Single(x => x.ProductId == productInfo.ProductId);
+            var item = cart.Itens.Single(x => x.ProductId == nikeShoes.ProductId);
             
-            Assert.Equal(productInfo.ProductName, item.ProductName);
-            Assert.Equal(productInfo.Price, item.ProductPrice);
+            Assert.Equal(nikeShoes.Name, item.ProductName);
+            Assert.Equal(nikeShoes.Price, item.ProductPrice);
         }
         
         [Theory]
@@ -86,11 +86,29 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
 
             AssumeProductApiWillFail(productId, numberOfFailures);
 
-            var cart = WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productId));
+            var cart = ((OkResult<Cart>)WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), productId))).Body;
             
             Assert.Contains(cart.Itens, x => x.ProductId == productId);
         }
 
+        [Fact]
+        public void UnavailableProductApiErrorResultShouldBeReturned()
+        {
+            var dummyProduct = new Dummy();
+            AssumeProductApiWillFail(dummyProduct.ProductId);
+
+            var errorResult = (ErrorResult)WhenCommandIsHandled(new AddItemCommand(Guid.NewGuid(), dummyProduct.ProductId));
+
+            Assert.Equal("Try again later. Some of our services are unavailable.", errorResult.Message);
+        }
+
+        private void AssumeProductApiWillFail(Guid productId)
+        {
+            productApiStub
+                .SetupSequence(x => x.GetProduct(productId))
+                .Throws<Exception>();
+        }
+        
         private void AssumeProductApiWillFail(Guid productId, int numberOfFailures)
         {
             var setupSequence = productApiStub
@@ -106,8 +124,10 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
                 .Returns(ProductInfoBuilder.For<Dummy>().Build());
         }
 
-        private void AssumeProductInfoIs(ProductInfo productInfo)
+        private void AssumeProductInfoIs(WellKnownProduct wellKnownProduct)
         {
+            var productInfo = new ProductInfoBuilder(wellKnownProduct).Build();
+            
             productApiStub
                 .Setup(x => x.GetProduct(productInfo.ProductId))
                 .Returns(productInfo);

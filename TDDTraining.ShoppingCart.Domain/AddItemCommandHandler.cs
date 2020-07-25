@@ -3,7 +3,7 @@ using Polly;
 
 namespace TDDTraining.ShoppingCart.Domain
 {
-    public class AddItemCommandHandler : IHandleCommand<AddItemCommand, Cart>
+    public class AddItemCommandHandler : IHandleCommand<AddItemCommand, IDomainResult>
     {
         private readonly ICartRepository cartRepository;
         private readonly IProductApi productApi;
@@ -16,7 +16,7 @@ namespace TDDTraining.ShoppingCart.Domain
             this.retryStrategy = retryStrategy;
         }
         
-        public Cart Handle(AddItemCommand command)
+        public IDomainResult Handle(AddItemCommand command)
         {
             var cart = 
                 cartRepository.GetByCustomerId(command.CustomerId) 
@@ -29,25 +29,38 @@ namespace TDDTraining.ShoppingCart.Domain
             
             var productInfo = productApiRetry.Execute(() => productApi.GetProduct(command.ProductId));
 
+            if(productInfo == null)
+                return new ErrorResult("Try again later. Some of our services are unavailable.");
+            
             cart.AddItem(command.ProductId, productInfo.ProductName, productInfo.Price);
 
             cartRepository.Save(cart);
             
-            return cart;
+            return new OkResult<Cart>(cart);
         }
     }
 
-    public class RetryStrategy
+    public interface IDomainResult
     {
-        public int RetryCount { get; }
-        public int Milliseconds { get; }
+    }
 
-        private RetryStrategy(int retryCount, int milliseconds)
+    public class OkResult<T> : IDomainResult
+    {
+        public T Body { get; }
+
+        public OkResult(T body)
         {
-            RetryCount = retryCount;
-            Milliseconds = milliseconds;
+            Body = body;
         }
-        
-        public static RetryStrategy CreateRetryStrategy() => new RetryStrategy(3, 50);
+    }
+
+    public class ErrorResult : IDomainResult
+    {
+        public string Message { get; }
+
+        public ErrorResult(string message)
+        {
+            Message = message;
+        }
     }
 }

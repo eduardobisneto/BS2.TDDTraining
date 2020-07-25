@@ -1,6 +1,6 @@
 namespace TDDTraining.ShoppingCart.Domain
 {
-    public class RemoveItemCommandHandler : IHandleCommand<RemoveItemCommand, Cart>
+    public class RemoveItemCommandHandler : IHandleCommand<RemoveItemCommand, IDomainResult>
     {
         private readonly ICartRepository repository;
 
@@ -9,15 +9,15 @@ namespace TDDTraining.ShoppingCart.Domain
             this.repository = repository;
         }
 
-        public Cart Handle(RemoveItemCommand command)
+        public IDomainResult Handle(RemoveItemCommand command)
         {
             var cart = repository.GetByCustomerId(command.CustomerId);
             
             if(cart == null)
-                return new Cart(command.CustomerId);
+                return new OkResult<Cart>(new Cart(command.CustomerId));
             
             cart.RemoveItem(command.ProductId);
-            return cart;
+            return new OkResult<Cart>(cart);
         }
     }
 }

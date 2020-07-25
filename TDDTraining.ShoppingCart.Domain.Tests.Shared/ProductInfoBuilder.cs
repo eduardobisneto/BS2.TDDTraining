@@ -4,7 +4,7 @@ namespace TDDTraining.ShoppingCart.Domain.Tests.Shared
     {
         private readonly WellKnownProduct wellKnowProduct;
 
-        private ProductInfoBuilder(WellKnownProduct wellKnowProduct)
+        public ProductInfoBuilder(WellKnownProduct wellKnowProduct)
         {
             this.wellKnowProduct = wellKnowProduct;
         }
