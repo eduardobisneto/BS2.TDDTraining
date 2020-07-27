@@ -1,6 +1,10 @@
-namespace TDDTraining.ShoppingCart.Domain
+using TDDTraining.ShoppingCart.Domain.Commands;
+using TDDTraining.ShoppingCart.Domain.Core;
+using TDDTraining.ShoppingCart.Domain.Repositories;
+
+namespace TDDTraining.ShoppingCart.Domain.CommandHandlers
 {
-    public class RemoveItemCommandHandler : IHandleCommand<RemoveItemCommand, IDomainResult>
+    public class RemoveItemCommandHandler : IHandleCommand<RemoveItemCommand>
     {
         private readonly ICartRepository repository;
 
@@ -12,8 +16,8 @@ namespace TDDTraining.ShoppingCart.Domain
         public IDomainResult Handle(RemoveItemCommand command)
         {
             var cart = repository.GetByCustomerId(command.CustomerId);
-            
-            if(cart == null)
+
+            if (cart == null)
                 return new OkResult<Cart>(new Cart(command.CustomerId));
             
             cart.RemoveItem(command.ProductId);

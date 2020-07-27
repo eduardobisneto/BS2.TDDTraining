@@ -26,10 +26,12 @@ namespace TDDTraining.ShoppingCart.Domain
         public void AddItem(Guid productId, string productName, decimal productPrice)
         {
             var item = itens.SingleOrDefault(x => x.ProductId == productId);
-            if(item == null)
+
+            if (item == null)
                 itens.Add(new Item(productId, productName, productPrice));
             else
                 item.IncreaseQuantity();
+
         }
 
         public void RemoveItem(Guid productId)

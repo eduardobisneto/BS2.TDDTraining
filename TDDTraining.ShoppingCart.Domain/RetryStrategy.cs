@@ -3,14 +3,14 @@ namespace TDDTraining.ShoppingCart.Domain
     public class RetryStrategy
     {
         public int RetryCount { get; }
-        public int Milliseconds { get; }
+        public int WaitMilliseconds { get; }
 
-        private RetryStrategy(int retryCount, int milliseconds)
+        private RetryStrategy(int retryCount, int waitMilliseconds)
         {
             RetryCount = retryCount;
-            Milliseconds = milliseconds;
+            WaitMilliseconds = waitMilliseconds;
         }
         
-        public static RetryStrategy CreateRetryStrategy() => new RetryStrategy(3, 50);
+        public static RetryStrategy CreateAddItemCommandRetryStrategy() => new RetryStrategy(3, 50);
     }
 }

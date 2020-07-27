@@ -2,22 +2,21 @@ namespace TDDTraining.ShoppingCart.Domain.Tests.Shared
 {
     public class ProductInfoBuilder
     {
-        private readonly WellKnownProduct wellKnowProduct;
+        private readonly WellKnowProduct wellKnowProduct;
 
-        public ProductInfoBuilder(WellKnownProduct wellKnowProduct)
+        public ProductInfoBuilder(WellKnowProduct wellKnowProduct)
         {
             this.wellKnowProduct = wellKnowProduct;
         }
 
-        public static ProductInfoBuilder For<T>() where T : WellKnownProduct, new()
+        public Apis.ProductInfo Build()
         {
-            var wellKnowProduct = new T();
-            return new ProductInfoBuilder(wellKnowProduct);
+            return new Apis.ProductInfo(wellKnowProduct.ProductId, wellKnowProduct.Name, wellKnowProduct.Price);
         }
 
-        public ProductInfo Build()
+        public static ProductInfoBuilder For<T>() where T : WellKnowProduct, new()
         {
-            return new ProductInfo(wellKnowProduct.ProductId, wellKnowProduct.Name, wellKnowProduct.Price);
+            return new ProductInfoBuilder(new T());
         }
     }
 }

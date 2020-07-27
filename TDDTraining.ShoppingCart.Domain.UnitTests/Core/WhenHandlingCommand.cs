@@ -1,22 +1,25 @@
+using TDDTraining.ShoppingCart.Domain.Core;
+using TDDTraining.ShoppingCart.Domain.Repositories;
 using TDDTraining.ShoppingCart.Domain.UnitTests.TestDoubles;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests.Core
 {
     public abstract class WhenHandlingCommand<TCommand, TCommandHandler>
-        where TCommandHandler : IHandleCommand<TCommand, IDomainResult>
+        where TCommandHandler : IHandleCommand<TCommand>
     {
         protected ICartRepository Repository { get; }
-
+        
         protected WhenHandlingCommand()
         {
-            Repository = new FakeCartRepository();
+            Repository = new FakeCartRepository(); 
         }
 
-        protected IDomainResult WhenCommandIsHandled(TCommand command)
+        protected TResult WhenCommandIsHandled<TResult>(TCommand command) where TResult : class, IDomainResult
         {
-            return CreateCommandHandler().Handle(command);
+            return CreateCommandHandler().Handle(command) as TResult;
         }
 
         protected abstract TCommandHandler CreateCommandHandler();
+
     }
 }

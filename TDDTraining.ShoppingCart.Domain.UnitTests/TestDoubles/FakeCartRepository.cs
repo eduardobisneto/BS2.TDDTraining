@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TDDTraining.ShoppingCart.Domain.Repositories;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests.TestDoubles
 {
-    internal class FakeCartRepository : ICartRepository
+    public class FakeCartRepository : ICartRepository
     {
-        private IList<Cart> carts = new List<Cart>();
+        private readonly List<Cart> carts = new List<Cart>();
         
         public Cart GetByCustomerId(Guid customerId)
         {

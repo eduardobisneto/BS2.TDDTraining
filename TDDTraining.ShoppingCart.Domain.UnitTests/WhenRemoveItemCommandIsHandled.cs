@@ -1,4 +1,7 @@
 using System;
+using TDDTraining.ShoppingCart.Domain.CommandHandlers;
+using TDDTraining.ShoppingCart.Domain.Commands;
+using TDDTraining.ShoppingCart.Domain.Core;
 using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
@@ -13,18 +16,17 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             GivenProductAlreadyExistsInCart(productId, customerId);
 
             var command = new RemoveItemCommand(customerId, productId);
-
-            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
+            var cart = WhenCommandIsHandled<OkResult<Cart>>(command).Body;
             
-            Assert.DoesNotContain(cart.Itens, x => x.ProductId == command.ProductId);
+            Assert.DoesNotContain(cart.Itens, x => x.ProductId == productId);
         }
-        
+
         [Fact]
         public void IfCartDoesNotExistsCommandDoesNotFailAndNewCartIsCreatedForCustomer()
         {
             var command = new RemoveItemCommand(Guid.NewGuid(), Guid.NewGuid());
             
-            var cart = ((OkResult<Cart>)WhenCommandIsHandled(command)).Body;
+            var cart = WhenCommandIsHandled<OkResult<Cart>>(command).Body;
             
             AssertNewCartWasCreatedToTheCustomer(cart, command);
         }

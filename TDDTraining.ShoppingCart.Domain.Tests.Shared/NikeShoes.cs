@@ -1,11 +1,14 @@
-using System;
-
 namespace TDDTraining.ShoppingCart.Domain.Tests.Shared
 {
-    public class NikeShoes : WellKnownProduct
+    public class NikeShoes : WellKnowProduct
     {
-        public override Guid ProductId => new Guid("617380e7-95c4-4eec-a95a-9635acccdfd5");
         public override string Name => nameof(NikeShoes);
         public override decimal Price => 100;
+    }
+
+    public class NonExistentProduct : WellKnowProduct
+    {
+        public override string Name => nameof(NonExistentProduct);
+        public override decimal Price => 0;
     }
 }

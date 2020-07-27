@@ -1,6 +1,6 @@
 using System;
 
-namespace TDDTraining.ShoppingCart.Domain
+namespace TDDTraining.ShoppingCart.Domain.Commands
 {
     public class RemoveItemCommand
     {

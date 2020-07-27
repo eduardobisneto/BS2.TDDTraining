@@ -1,11 +1,12 @@
 using System;
 
-namespace TDDTraining.ShoppingCart.Domain
+namespace TDDTraining.ShoppingCart.Domain.Commands
 {
     public class AddItemCommand
     {
-        public Guid CustomerId { get; }
         public Guid ProductId { get; }
+        public Guid CustomerId { get; }
+
         public AddItemCommand(Guid customerId, Guid productId)
         {
             CustomerId = customerId;

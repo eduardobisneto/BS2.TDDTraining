@@ -1,6 +1,6 @@
 using System;
 
-namespace TDDTraining.ShoppingCart.Domain
+namespace TDDTraining.ShoppingCart.Domain.Apis
 {
     public interface IProductApi
     {
