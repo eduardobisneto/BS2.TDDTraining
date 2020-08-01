@@ -25,18 +25,16 @@ namespace TDDTraining.ShoppingCart.Domain.CommandHandlers
         public IDomainResult Handle(AddItemCommand command)
         {
             var cart = cartRepository.GetByCustomerId(command.CustomerId) 
-                       ?? new Cart(command.CustomerId);
+                       ?? new Cart(new Customer(command.CustomerId, CustomerStatus.Standard));
 
             var productApiRetry = Policy
                 .Handle<Exception>()
                 .WaitAndRetry(
                     retryStrategy.RetryCount, 
                     attempt => TimeSpan.FromMilliseconds(retryStrategy.WaitMilliseconds));
-
-
+            
             Apis.ProductInfo productInfo = null;
-
-
+            
             try
             {
                 productInfo = productApiRetry.Execute(() => productApi.GetProduct(command.ProductId));
@@ -49,7 +47,7 @@ namespace TDDTraining.ShoppingCart.Domain.CommandHandlers
 
             if (productInfo == null)
             {
-                return new ProductDoesNotExist();
+                return new ProductDoesNotExistError();
             }
 
             cart.AddItem(command.ProductId, productInfo.ProductName, productInfo.Price);

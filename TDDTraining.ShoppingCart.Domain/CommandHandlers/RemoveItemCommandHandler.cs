@@ -18,7 +18,7 @@ namespace TDDTraining.ShoppingCart.Domain.CommandHandlers
             var cart = repository.GetByCustomerId(command.CustomerId);
 
             if (cart == null)
-                return new OkResult<Cart>(new Cart(command.CustomerId));
+                return new OkResult<Cart>(new Cart(new Customer(command.CustomerId, CustomerStatus.Standard)));
             
             cart.RemoveItem(command.ProductId);
             return new OkResult<Cart>(cart);

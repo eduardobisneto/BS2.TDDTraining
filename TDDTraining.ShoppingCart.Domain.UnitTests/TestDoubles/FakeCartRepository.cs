@@ -11,7 +11,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests.TestDoubles
         
         public Cart GetByCustomerId(Guid customerId)
         {
-            return carts.SingleOrDefault(x => x.CustomerId == customerId);
+            return carts.SingleOrDefault(x => x.Customer.Id == customerId);
         }
 
         public void Save(Cart cart)

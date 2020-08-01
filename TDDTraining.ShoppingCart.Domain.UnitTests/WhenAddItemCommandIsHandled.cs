@@ -36,7 +36,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         {
             var command = new AddItemCommand(Guid.NewGuid(), Guid.NewGuid());
             var cart = WhenCommandIsHandled<OkResult<Cart>>(command).Body;
-            Assert.Equal(command.CustomerId, cart.CustomerId);
+            Assert.Equal(command.CustomerId, cart.Customer.Id);
         }
 
         [Fact]
@@ -78,6 +78,34 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             Assert.Equal(nikeShoes.Price, item.ProductPrice);
         }
 
+        [Fact]
+        public void CartTotalShouldBeSumOfItems()
+        {
+            var nikeShoes = new NikeShoes();
+            
+            AssumeProductInfoIs(nikeShoes);
+
+            var cart = WhenCommandIsHandled<OkResult<Cart>>(new AddItemCommand(Guid.NewGuid(), nikeShoes.ProductId))
+                .Body;
+            
+            Assert.Equal(nikeShoes.Price, cart.Total);
+        }
+
+        [Fact]
+        public void CartTotalShouldBeSumOfItemsTimesQuantities()
+        {
+            var nikeShoes = new NikeShoes();
+            
+            AssumeProductInfoIs(nikeShoes);
+
+            var customerId = Guid.NewGuid();
+            
+            WhenCommandIsHandled<OkResult<Cart>>(new AddItemCommand(customerId, nikeShoes.ProductId));
+            var cart = WhenCommandIsHandled<OkResult<Cart>>(new AddItemCommand(customerId, nikeShoes.ProductId)).Body;
+            
+            Assert.Equal(200, cart.Total);
+        }
+        
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
@@ -119,7 +147,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             var nonExistentProduct = new NonExistentProduct();
             AssumeProductDoesNotExist(nonExistentProduct);
 
-            var error = WhenCommandIsHandled<ProductDoesNotExist>(new AddItemCommand(Guid.NewGuid(),
+            var error = WhenCommandIsHandled<ProductDoesNotExistError>(new AddItemCommand(Guid.NewGuid(),
                 nonExistentProduct.ProductId));
             
             Assert.NotNull(error);
@@ -152,11 +180,11 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             setupSequence.Returns(ProductInfoBuilder.For<Dummy>().Build());
         }
 
-        private void AssumeProductInfoIs(WellKnowProduct wellKnowProduct)
+        private void AssumeProductInfoIs(WellKnownProduct wellKnownProduct)
         {
             productApiStub
-                .Setup(x => x.GetProduct(wellKnowProduct.ProductId))
-                .Returns(new ProductInfoBuilder(wellKnowProduct).Build());
+                .Setup(x => x.GetProduct(wellKnownProduct.ProductId))
+                .Returns(new ProductInfoBuilder(wellKnownProduct).Build());
         }
         
         protected override AddItemCommandHandler CreateCommandHandler()

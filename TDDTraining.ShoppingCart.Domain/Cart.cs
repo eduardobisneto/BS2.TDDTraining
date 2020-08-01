@@ -6,20 +6,23 @@ namespace TDDTraining.ShoppingCart.Domain
 {
     public class Cart
     {
+        public Customer Customer { get; }
         public Guid Id { get; }
-        public Guid CustomerId { get; }
         
         private List<Item> itens;
         public IReadOnlyCollection<Item> Itens => itens.AsReadOnly();
+        public decimal Total => ItemsTotal - Discount;
+        public decimal Discount => Customer.CustomerStatus.GetDiscount(ItemsTotal);
+        public decimal ItemsTotal => itens.Sum(x => x.Total);
 
         private Cart()
         {
             Id = Guid.NewGuid();
         }
         
-        public Cart(Guid customerId) : this()
+        public Cart(Customer customer) : this()
         {
-            CustomerId = customerId;
+            Customer = customer;
             itens = new List<Item>();
         }
 

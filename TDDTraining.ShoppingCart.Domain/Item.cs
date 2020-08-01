@@ -8,6 +8,7 @@ namespace TDDTraining.ShoppingCart.Domain
         public int Quantity { get; private set; }
         public decimal ProductPrice { get; }
         public string ProductName { get; }
+        public decimal Total => Quantity * ProductPrice;
 
         public Item(Guid productId, string productName, decimal productPrice)
         {

@@ -31,10 +31,18 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             AssertNewCartWasCreatedToTheCustomer(cart, command);
         }
 
+        [Fact]
+        public void EmptyCartTotalShouldBeZero()
+        {
+            var cart = WhenCommandIsHandled<OkResult<Cart>>(new RemoveItemCommand(Guid.NewGuid(), Guid.NewGuid())).Body;
+
+            Assert.Equal(0, cart.Total);
+        }
+
         private static void AssertNewCartWasCreatedToTheCustomer(Cart cart, RemoveItemCommand command)
         {
             Assert.NotNull(cart);
-            Assert.Equal(command.CustomerId, cart.CustomerId);
+            Assert.Equal(command.CustomerId, cart.Customer.Id);
         }
 
         protected override RemoveItemCommandHandler CreateCommandHandler()
