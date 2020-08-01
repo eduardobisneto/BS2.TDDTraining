@@ -4,75 +4,19 @@ using Xunit;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
-    public class WhenCalculatingCartTotalForStandardCustomer
+    public abstract class WhenCalculatingCartTotal<T> : IClassFixture<CartWithNikeShoesScenarioFor<T>> where T : WellKnownCustomer, new()
     {
-        [Fact]
-        public void CartTotalShouldBeItemsTotalMinusDiscount()
-        {
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<StandardCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
+        protected CartWithNikeShoesScenarioFor<T> Scenario { get; }
 
-            Assert.Equal(100, cart.Total);
-        }
-        
-        [Fact]
-        public void DiscountShouldBeZero()
-        {            
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<StandardCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
-            
-            Assert.Equal(0, cart.Discount);
+        protected WhenCalculatingCartTotal(CartWithNikeShoesScenarioFor<T> scenario)
+        {
+            Scenario = scenario;
         }
         
         [Fact]
         public void ItemsTotalShouldBeSumOfItemsTimesQuantity()
         {
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<StandardCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
-            
-            Assert.Equal(100, cart.ItemsTotal);
-        }
-    }
-    
-    public class WhenCalculatingCartTotalForPrimeCustomer
-    {
-        [Fact]
-        public void CartTotalShouldBeItemsTotalMinusDiscount()
-        {
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<PrimeCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
-            
-            Assert.Equal(90, cart.Total);
-        }
-        
-        [Fact]
-        public void DiscountShouldBeTeenPercent()
-        {
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<PrimeCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
-            
-            Assert.Equal(10, cart.Discount);
-        }
-        
-        [Fact]
-        public void ItemsTotalShouldBeSumOfItemsTimesQuantity()
-        {
-            var cart = new CartBuilder()
-                .WithCustomer(CustomerBuilder.For<PrimeCustomer>())
-                .WithItem(ItemBuilder.For<NikeShoes>())
-                .Build();
-            
-            Assert.Equal(100, cart.ItemsTotal);
+            Assert.Equal(100, Scenario.Cart.ItemsTotal);
         }
     }
 }

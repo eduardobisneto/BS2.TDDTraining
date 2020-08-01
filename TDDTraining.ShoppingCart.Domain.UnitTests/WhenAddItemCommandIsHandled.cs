@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using TDDTraining.ShoppingCart.Domain.Apis;
@@ -7,17 +8,20 @@ using TDDTraining.ShoppingCart.Domain.Commands;
 using TDDTraining.ShoppingCart.Domain.Core;
 using TDDTraining.ShoppingCart.Domain.Tests.Shared;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace TDDTraining.ShoppingCart.Domain.UnitTests
 {
 
     public class WhenAddItemCommandIsHandled : WhenHandlingCartCommand<AddItemCommand, AddItemCommandHandler>
     {
+        private readonly ITestOutputHelper stdout;
         private readonly Mock<IProductApi> productApiStub;
         private readonly Mock<ILogger> loggerMock;
 
-        public WhenAddItemCommandIsHandled()
+        public WhenAddItemCommandIsHandled(ITestOutputHelper stdout)
         {
+            this.stdout = stdout;
             productApiStub = CreateProductApiStub();
             loggerMock = CreateLoggerMock();
         }
@@ -27,6 +31,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         {
             var command = new AddItemCommand(Guid.NewGuid(), Guid.NewGuid());
             var cart = WhenCommandIsHandled<OkResult<Cart>>(command).Body;
+            stdout.WriteLine($"ProductId: {command.ProductId}");
             var item = cart.Itens.Single(x => x.ProductId == command.ProductId);
             Assert.Equal(1, item.Quantity);
         }
@@ -107,9 +112,7 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         }
         
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
+        [MemberData(nameof(NumberOfFailures))]
         public void IfProductApiFailsProductShouldBeAddedToCart(int numberOfFailures)
         {
             var productId = Guid.NewGuid();
@@ -118,6 +121,28 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
             var cart = WhenCommandIsHandled<OkResult<Cart>>(new AddItemCommand(Guid.NewGuid(), productId)).Body;
 
             Assert.Contains(cart.Itens, x => x.ProductId == productId);
+        }
+
+        public static TheoryData<int> NumberOfFailures()
+        {
+            return new TheoryData<int> {1, 2, 3};
+        }
+        
+        [Theory]
+        [MemberData(nameof(Products))]
+        public void FakeProductTest(WellKnownProduct product, decimal expectedPrice)
+        {
+            Assert.Equal(expectedPrice, product.Price);
+        }
+
+        public static TheoryData<WellKnownProduct, decimal> Products()
+        {
+            return new TheoryData<WellKnownProduct, decimal>
+            {
+                {new NikeShoes(), 100} , 
+                {new Dummy(), 10}, 
+                {new NonExistentProduct(), 0}
+            };
         }
 
         [Fact]

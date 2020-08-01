@@ -1,5 +1,3 @@
-using System;
-
 namespace TDDTraining.ShoppingCart.Domain.Tests.Shared
 {
     public class CustomerBuilder
@@ -19,23 +17,5 @@ namespace TDDTraining.ShoppingCart.Domain.Tests.Shared
         {
             return new Customer(wellKnownCustomer.CustomerId, wellKnownCustomer.CustomerStatus);
         }
-    }
-
-    public abstract class WellKnownCustomer
-    {
-        private Guid? customerId;
-        public virtual Guid CustomerId => customerId ?? (customerId = Guid.NewGuid()).Value;
-        
-        public abstract CustomerStatus CustomerStatus { get; }
-    }
-    
-    public sealed class PrimeCustomer : WellKnownCustomer
-    {
-        public override CustomerStatus CustomerStatus => CustomerStatus.Prime;
-    }
-
-    public sealed class StandardCustomer : WellKnownCustomer
-    {
-        public override CustomerStatus CustomerStatus => CustomerStatus.Standard;
     }
 }

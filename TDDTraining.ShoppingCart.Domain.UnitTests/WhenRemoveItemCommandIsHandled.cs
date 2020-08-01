@@ -26,7 +26,10 @@ namespace TDDTraining.ShoppingCart.Domain.UnitTests
         {
             var command = new RemoveItemCommand(Guid.NewGuid(), Guid.NewGuid());
             
-            var cart = WhenCommandIsHandled<OkResult<Cart>>(command).Body;
+            WhenCommandIsHandled<OkResult<Cart>>(command);
+
+            // como seria do ponto de vista de um teste de integracao
+            var cart = Repository.GetByCustomerId(command.CustomerId);
             
             AssertNewCartWasCreatedToTheCustomer(cart, command);
         }
